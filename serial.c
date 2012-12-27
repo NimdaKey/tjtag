@@ -64,7 +64,7 @@ int readWithTimeout(int fd, unsigned char *out, int length, int timeout)
 
 int configurePort(int fd, unsigned long baudrate)
 {
-    speed_t baud = B921600;
+	speed_t baud;
 	struct termios g_new_tio;
 
 	switch (baudrate) {

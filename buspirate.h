@@ -34,11 +34,17 @@ enum {
     OOCD_MODE_JTAG_OD=2, // open-drain outputs
 };
 
+enum {
+	OOCD_SERIAL_NORMAL=0,
+	OOCD_SERIAL_FAST=1
+};
+
 int BP_EnableBinary(int);
 void BP_DisableBinary(int fd);
 int BP_EnableOCD(int fd);
 void BP_OCDMode(int fd, int mode);
 void BP_OCDFeature(int fd, int feature, int value);
+void BP_OCDFastSerial(int fd);
 int BP_OCDTapShift(int fd, unsigned char *tdodata, const unsigned char *tdidata, const unsigned char *tmsdata, int bitcount);
 
 #endif /* BUSPIRATE_H_ */

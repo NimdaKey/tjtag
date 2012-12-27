@@ -78,6 +78,7 @@ int speedtouch       = 0;
 int DEBUG            = 0;
 int Flash_DEBUG      = 0;
 int probe_options    = 0;
+int bpfast           = 0;
 
 
 unsigned int    flash_size     = 0;
@@ -431,16 +432,20 @@ void lpt_openport(void)
 {
 #ifdef BUSPIRATE
     pfd = openPort(BP_PORT,0);
-    configurePort(pfd, 1000000);
+    configurePort(pfd, 115200); /* use safe speed by default */
     if ( BP_EnableBinary( pfd ) != BBIO ) {
         fprintf( stderr, "Couldn't start binary mode\n" );
         exit(-1);
     }
-
     if (BP_EnableOCD(pfd) != OOCD) {
-        printf("Couldn't start OOCD mode\n");
+        fprintf( stderr, "Couldn't start OOCD mode\n");
         exit(-1);
     }
+    if (bpfast) {
+        fprintf( stderr, "Trying to enable fast mode...\n");
+        BP_OCDFastSerial(pfd);
+    }
+
     BP_OCDMode(pfd, OOCD_MODE_JTAG);
 
     // not needed, just for fun
@@ -3121,6 +3126,7 @@ int main(int argc, char** argv)
             else if (strncasecmp(choice,"/freq:",6)==0)        frequency = strtoul(((char *)choice + 6),NULL,10);
             else if (strcasecmp(choice,"/xbit")==0)            xbit = 1;
             else if (strcasecmp(choice,"/swap_endian")==0)      swap_endian = 1;
+            else if (strcasecmp(choice,"/bpfast")==0)          bpfast=1;
             else
             {
                 show_usage();

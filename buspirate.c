@@ -117,6 +117,32 @@ void BP_OCDFeature(int fd, int feature, int value)
 	serial_write(fd, buf, 3);	
 }
 
+void BP_OCDFastSerial(int fd)
+{
+	int ret;
+
+	buf[0] = OOCD_CMD_UART_SPEED;
+	buf[1] = OOCD_SERIAL_FAST;
+	serial_write(fd, buf, 2);
+	
+	/* set the speed from our side */
+	configurePort(fd, 1000000);
+	usleep(100000);
+	
+	/* send testing sequence */
+	buf[0] = 0xAA;
+	buf[1] = 0x55;
+	serial_write(fd, buf, 2);
+
+	ret = readWithTimeout(fd, buf, 2, 100000);
+	if ( (ret != 2) || (buf[0] != OOCD_CMD_UART_SPEED) || (buf[1] != OOCD_SERIAL_FAST) ) {
+		printf("Buspirate didn't respond correctly: (%d, %d, %d)\n",ret, buf[0], buf[1]);
+		printf("Reverting to normal speed.\n");
+		configurePort(fd, 115200);
+	} else
+		printf("Buspirate is operating in FAST mode.\n");
+}
+
 void print_buffer(unsigned char * buf, int count)
 {
 	unsigned int i;
